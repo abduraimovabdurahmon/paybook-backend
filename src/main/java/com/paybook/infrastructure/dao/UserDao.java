@@ -33,21 +33,23 @@ public class UserDao {
     }
 
     @Transactional
-    public User updateUserName(UUID id, String name) {
+    public void updateUserName(UUID id, String name) {
         User user = findById(id);
         if (user != null) {
             user.setName(name);
-            return userRepository.save(user);
+            userRepository.save(user);
+            return;
         }
         throw new RuntimeException("User not found");
     }
 
     @Transactional
-    public User updateUsername(UUID id, String username) {
+    public void updateUsername(UUID id, String username) {
         User user = findById(id);
         if (user != null) {
             user.setUsername(username);
-            return userRepository.save(user);
+            userRepository.save(user);
+            return;
         }
         throw new RuntimeException("User not found");
     }

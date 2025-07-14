@@ -9,6 +9,8 @@ const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'paybook';
 
 console.log(`Redis host: ${REDIS_HOST}, port: ${REDIS_PORT}, password: ${REDIS_PASSWORD}`);
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 
 
 const redisClient = redis.createClient({

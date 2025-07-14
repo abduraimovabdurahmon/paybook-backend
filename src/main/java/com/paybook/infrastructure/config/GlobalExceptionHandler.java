@@ -2,6 +2,8 @@ package com.paybook.infrastructure.config;
 
 import com.paybook.application.dto.response.ErrorResponse;
 import com.paybook.domain.exception.InvalidCodeException;
+import com.paybook.domain.exception.UserNotFoundException;
+import com.paybook.domain.exception.UsernameValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "So‘rovning asosiy qismi yo‘q yoki yaroqsiz",
+                "So‘rovning asosiy qismi yo‘q, ortiqcha maydonlar mavjud yoki yaroqsiz",
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         );
@@ -41,10 +43,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
-                "Kutilmagan xatolik yuz berdi: " + ex.getMessage(),
+                ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(UsernameValidationException.class)
+    public ResponseEntity<ErrorResponse> handleUsernameValidationException(UsernameValidationException ex) {
+        return new ResponseEntity<>(ex.getErrorResponse(), HttpStatus.valueOf(ex.getErrorResponse().getStatus()));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(ex.getErrorResponse(), HttpStatus.valueOf(ex.getErrorResponse().getStatus()));
     }
 }

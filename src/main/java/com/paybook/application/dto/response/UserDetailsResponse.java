@@ -11,10 +11,11 @@ import lombok.ToString;
 @Data
 public class UserDetailsResponse {
     private String name;
-    private String phoneNumber;
     private String username;
+    private String phoneNumber;
 
     public UserDetailsResponse() {
 
     }
+
 }

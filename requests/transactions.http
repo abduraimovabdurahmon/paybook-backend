@@ -1,0 +1,12 @@
+@env = dev
+
+### Get months json
+GET http://localhost:8080/api/transactions/months
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+
+### Get full balance
+GET http://localhost:8080/api/transactions/balance?month=2025.06.01
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

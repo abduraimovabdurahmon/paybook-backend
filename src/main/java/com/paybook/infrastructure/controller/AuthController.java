@@ -4,6 +4,7 @@ import com.paybook.application.dto.request.AuthRequest;
 import com.paybook.application.dto.request.RefreshTokenRequest;
 import com.paybook.application.dto.response.AuthResponse;
 import com.paybook.application.usecase.AuthUseCase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthUseCase authUseCase;
+    @Autowired
+    private AuthUseCase authUseCase;
 
-    public AuthController(AuthUseCase authUseCase) {
-        this.authUseCase = authUseCase;
-    }
+
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
