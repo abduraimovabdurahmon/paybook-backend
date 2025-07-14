@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: Paybook
+
+  # Database sozlamalari
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  # Databasening qo'shimcha sozlamalari
+  jpa:
+    hibernate:
+      ddl-auto: update  # yoki 'create', 'create-drop', 'validate', 'none'
+    show-sql: true       # SQL querylarni konsolda ko?rsatadi
+    properties:
+      hibernate:
+        format_sql: true # SQL'ni chiroyli formatda chiqaradi
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  # Redis sozlamalari
+  data:
+    redis:
+      host: localhost
+      password: paybook
+      port: 6379
+
+# Jwt sozlamalari
+jwt:
+  secret: your-very-long-and-secure-secret-key-here-32chars+
+  refresh-token:
+    expiration: 31536000
+  access-token:
+    expiration: 3600
