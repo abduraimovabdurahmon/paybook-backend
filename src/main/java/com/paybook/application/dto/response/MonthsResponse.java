@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class MonthsResponse {
-    private String title;
+    private String label;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
     private String value;

@@ -38,7 +38,7 @@ public class TransactionService implements TransactionUseCase {
             LocalDate monthDate = currentDate.minusMonths(i).withDayOfMonth(1);
 
             MonthsResponse response = new MonthsResponse();
-            response.setTitle(formatter.formatMonthTitle(monthDate));
+            response.setLabel(formatter.formatMonthTitle(monthDate));
             response.setValue(monthDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
 
             monthsList.add(response);
@@ -57,6 +57,10 @@ public class TransactionService implements TransactionUseCase {
 
         if (monthParam == null || monthParam.isEmpty()) {
             throw new IllegalArgumentException("Month parametri majburiy!");
+        }
+
+        if (monthParam.equals("current")) {
+            monthParam = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         }
 
         // 'yyyy.MM.dd' formatidan LocalDate ga parse qilamiz
