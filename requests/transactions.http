@@ -28,3 +28,10 @@ Authorization: Bearer {{accessToken}}
 GET http://localhost:8080/api/transactions/debt/balance?month=2025.06.01
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
+
+
+
+### Get income transactions
+GET http://localhost:8080/api/transactions/income?month=2025.06.01
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

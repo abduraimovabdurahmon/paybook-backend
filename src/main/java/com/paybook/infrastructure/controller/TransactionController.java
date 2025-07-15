@@ -1,15 +1,11 @@
 package com.paybook.infrastructure.controller;
 
-import com.paybook.application.dto.response.BalanceResponse;
-import com.paybook.application.dto.response.DebtBalanceResponce;
-import com.paybook.application.dto.response.MonthsResponse;
-import com.paybook.application.dto.response.TransactionsResponse;
+import com.paybook.application.dto.response.*;
 import com.paybook.application.usecase.TransactionUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,7 +63,7 @@ public class TransactionController {
         return transactionUseCase.getFullBalance(userId, dateRange.startDate(), dateRange.endDate());
     }
 
-    // Income transactions
+    // Income transactions balance
     @GetMapping("income/balance")
     private BalanceResponse getIncomeBalance() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -75,7 +71,7 @@ public class TransactionController {
         return transactionUseCase.getIncomeBalance(userId, dateRange.startDate(), dateRange.endDate());
     }
 
-    // Expense transactions
+    // Expense transactions balance
     @GetMapping("expense/balance")
     private BalanceResponse getExpenseBalance() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -84,12 +80,23 @@ public class TransactionController {
     }
 
 
-    // Debt transactions
+    // Debt transactions balance
     @GetMapping("debt/balance")
-    protected DebtBalanceResponce getDebtBalance() {
+    protected DebtBalanceResponse getDebtBalance() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         DateRange dateRange = getUserIdAndDateRange();
         return transactionUseCase.getDebtBalance(userId, dateRange.startDate(), dateRange.endDate());
+    }
+
+
+    @GetMapping("income")
+    private IncomeTransactionsResponse getIncomeTransactions() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        DateRange dateRange = getUserIdAndDateRange();
+        List<IncomeTransaction> incomeTransactions = transactionUseCase.getIncomeTransactions(userId, dateRange.startDate(), dateRange.endDate());
+        IncomeTransactionsResponse incomeTransactionsResponse = new IncomeTransactionsResponse();
+        incomeTransactionsResponse.setTransactions(incomeTransactions);
+        return incomeTransactionsResponse;
     }
 
 

@@ -1,9 +1,9 @@
 package com.paybook.infrastructure.dao;
 
-import com.paybook.application.dto.response.DebtBalanceResponce;
-import com.paybook.application.dto.response.TransactionsResponse;
-import com.paybook.application.enums.TransactionType;
-import com.paybook.domain.entity.Category;
+import com.paybook.application.dto.response.DebtBalanceResponse;
+import com.paybook.application.dto.response.IncomeTransaction;
+import com.paybook.application.dto.response.IncomeTransactionsResponse;
+import com.paybook.domain.entity.Income;
 import com.paybook.infrastructure.repository.DebtRepository;
 import com.paybook.infrastructure.repository.ExpenseRepository;
 import com.paybook.infrastructure.repository.IncomeRepository;
@@ -119,7 +119,7 @@ public class TransactionDao {
         return (result != null) ? new BigDecimal(result.toString()) : BigDecimal.ZERO;
     }
 
-    public DebtBalanceResponce getTotalDebtBalance(String userId, LocalDate localDate, LocalDate localDate1) {
+    public DebtBalanceResponse getTotalDebtBalance(String userId, LocalDate startDate, LocalDate endDate) {
         // lend and borrow
         String sql = """
                 SELECT 
@@ -131,17 +131,66 @@ public class TransactionDao {
         Query query = entityManager.createNativeQuery(sql);
         Map<String, Object> params = Map.of(
                 "userId", UUID.fromString(userId),
-                "start", Timestamp.valueOf(localDate.atStartOfDay()),
-                "end", Timestamp.valueOf(localDate1.atStartOfDay())
+                "start", Timestamp.valueOf(startDate.atStartOfDay()),
+                "end", Timestamp.valueOf(endDate.atStartOfDay())
         );
 
         params.forEach(query::setParameter);
         Object[] result = (Object[]) query.getSingleResult();
         BigDecimal totalLend = (result[0] != null) ? new BigDecimal(result[0].toString()) : BigDecimal.ZERO;
         BigDecimal totalBorrow = (result[1] != null) ? new BigDecimal(result[1].toString()) : BigDecimal.ZERO;
-        DebtBalanceResponce response = new DebtBalanceResponce();
+        DebtBalanceResponse response = new DebtBalanceResponse();
         response.setTotalLend(totalLend);
         response.setTotalBorrow(totalBorrow);
         return response;
+    }
+
+    public List<IncomeTransaction> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate) {
+        String sql = """
+                SELECT
+                    i.id,
+                    c.icon,
+                    c.bg_color,
+                    c.title,
+                    i.description,
+                    i.amount,
+                    TO_CHAR(i.created_at, 'YYYY-MM-DD HH24:MI') AS created_at
+                FROM income i
+                LEFT JOIN category c ON i.category_id = c.id
+                WHERE i.user_id = :userId
+                  AND i.created_at BETWEEN :startDate AND :endDate
+                ORDER BY i.created_at DESC;
+        """;
+
+        Query query = entityManager.createNativeQuery(sql);
+
+        Map<String, Object> params = Map.of(
+                "userId", UUID.fromString(userId),
+                "startDate", Timestamp.valueOf(startDate.atStartOfDay()),
+                "endDate", Timestamp.valueOf(endDate.atStartOfDay())
+        );
+
+        params.forEach(query::setParameter);
+
+        var transactions = query.getResultList();
+        if (transactions == null || transactions.isEmpty()) {
+            return List.of();
+        }
+
+        List<IncomeTransaction> transactionsResponses = new ArrayList<>();
+        for (Object obj : transactions) {
+            Object[] row = (Object[]) obj;
+            IncomeTransaction response = new IncomeTransaction();
+            response.setId(UUID.fromString(row[0].toString()));
+            response.setIcon(row[1].toString());
+            response.setBgColor(row[2].toString());
+            response.setTitle(row[3].toString());
+            response.setDescription(row[4].toString());
+            response.setAmount(new BigDecimal(row[5].toString()));
+            response.setCreatedAt(row[6].toString());
+            transactionsResponses.add(response);
+        }
+
+        return transactionsResponses;
     }
 }

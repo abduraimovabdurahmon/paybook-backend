@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class DebtBalanceResponce {
+public class DebtBalanceResponse {
     BigDecimal totalLend;
     BigDecimal totalBorrow;
 }

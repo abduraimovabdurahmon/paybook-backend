@@ -1,24 +1,18 @@
 package com.paybook.application.service;
 
-import com.paybook.application.dto.response.BalanceResponse;
-import com.paybook.application.dto.response.DebtBalanceResponce;
-import com.paybook.application.dto.response.MonthsResponse;
-import com.paybook.application.dto.response.TransactionsResponse;
+import com.paybook.application.dto.response.*;
 import com.paybook.application.usecase.TransactionUseCase;
 import com.paybook.infrastructure.dao.TransactionDao;
 import com.paybook.infrastructure.utils.Formatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 @Service
 public class TransactionService implements TransactionUseCase {
@@ -62,8 +56,8 @@ public class TransactionService implements TransactionUseCase {
 
     // Foydalanuvchi uchun daromad balansini olib keladi
     @Override
-    public BalanceResponse getIncomeBalance(String userId, LocalDate StartDate, LocalDate EndDate) {
-        BigDecimal totalBalance = transactionDao.getTotalIncomeBalance(userId, StartDate, EndDate);
+    public BalanceResponse getIncomeBalance(String userId, LocalDate startDate, LocalDate endDate) {
+        BigDecimal totalBalance = transactionDao.getTotalIncomeBalance(userId, startDate, endDate);
         BalanceResponse response = new BalanceResponse();
         response.setBalance(totalBalance);
         return response;
@@ -79,8 +73,17 @@ public class TransactionService implements TransactionUseCase {
     }
 
     @Override
-    public DebtBalanceResponce getDebtBalance(String userId, LocalDate localDate, LocalDate localDate1) {
-        return transactionDao.getTotalDebtBalance(userId, localDate, localDate1);
+    public DebtBalanceResponse getDebtBalance(String userId, LocalDate startDate, LocalDate endDate) {
+        return transactionDao.getTotalDebtBalance(userId, startDate, endDate);
+    }
+
+    @Override
+    public List<IncomeTransaction> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate) {
+        List<IncomeTransaction> transactions = transactionDao.getIncomeTransactions(userId, startDate, endDate);
+        if (transactions == null || transactions.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return transactions;
     }
 
 

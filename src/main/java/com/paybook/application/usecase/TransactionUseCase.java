@@ -1,9 +1,6 @@
 package com.paybook.application.usecase;
 
-import com.paybook.application.dto.response.BalanceResponse;
-import com.paybook.application.dto.response.DebtBalanceResponce;
-import com.paybook.application.dto.response.MonthsResponse;
-import com.paybook.application.dto.response.TransactionsResponse;
+import com.paybook.application.dto.response.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,9 +11,11 @@ public interface TransactionUseCase {
 
     BalanceResponse getFullBalance(String userId, LocalDate startDate, LocalDate endDate);
 
-    BalanceResponse getIncomeBalance(String userId, LocalDate StartDate, LocalDate EndDate);
+    BalanceResponse getIncomeBalance(String userId, LocalDate startDate, LocalDate endDate);
 
-    BalanceResponse getExpenseBalance(String userId, LocalDate StartDate, LocalDate EndDate);
+    BalanceResponse getExpenseBalance(String userId, LocalDate startDate, LocalDate endDate);
 
-    DebtBalanceResponce getDebtBalance(String userId, LocalDate localDate, LocalDate localDate1);
+    DebtBalanceResponse getDebtBalance(String userId, LocalDate startDate, LocalDate endDate);
+
+    List<IncomeTransaction> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate);
 }
