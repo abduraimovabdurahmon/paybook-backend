@@ -44,6 +44,9 @@ public class Expense {
     @Column(name = "currency", nullable = false)
     private CurrencyType currency;
 
+    @ManyToOne()
+    @JoinColumn(name = "category_id", nullable = true)
+    private Category category;
 
     /**
      * Creation timestamp of the expense

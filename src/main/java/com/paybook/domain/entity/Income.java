@@ -46,6 +46,12 @@ public class Income {
     private CurrencyType currency;
 
 
+    @ManyToOne()
+    @JoinColumn(name = "category_id", nullable = true)
+    private Category category;
+
+
+
     /**
      * Creation timestamp of the income
      * Automatically set to current time when created
