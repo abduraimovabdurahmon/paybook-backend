@@ -1,7 +1,9 @@
 package com.paybook.application.service;
 
 import com.paybook.application.dto.response.BalanceResponse;
+import com.paybook.application.dto.response.DebtBalanceResponce;
 import com.paybook.application.dto.response.MonthsResponse;
+import com.paybook.application.dto.response.TransactionsResponse;
 import com.paybook.application.usecase.TransactionUseCase;
 import com.paybook.infrastructure.dao.TransactionDao;
 import com.paybook.infrastructure.utils.Formatter;
@@ -16,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @Service
 public class TransactionService implements TransactionUseCase {
@@ -38,7 +41,7 @@ public class TransactionService implements TransactionUseCase {
             LocalDate monthDate = currentDate.minusMonths(i).withDayOfMonth(1);
 
             MonthsResponse response = new MonthsResponse();
-            response.setTitle(formatter.formatMonthTitle(monthDate));
+            response.setLabel(formatter.formatMonthTitle(monthDate));
             response.setValue(monthDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
 
             monthsList.add(response);
@@ -50,26 +53,34 @@ public class TransactionService implements TransactionUseCase {
 
     // Umumiy balansni olib keladi
     @Override
-    public BalanceResponse getFullBalance(String userId) {
-        // RequestParam orqali kelgan "month"ni olish uchun
-        String monthParam = ServletRequestAttributes.class.cast(RequestContextHolder.getRequestAttributes())
-                .getRequest().getParameter("month");
-
-        if (monthParam == null || monthParam.isEmpty()) {
-            throw new IllegalArgumentException("Month parametri majburiy!");
-        }
-
-        // 'yyyy.MM.dd' formatidan LocalDate ga parse qilamiz
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        LocalDate startDate = LocalDate.parse(monthParam, formatter);
-        LocalDate endDate = startDate.plusMonths(1); // 1 oy qo‘shamiz
-
-        // SQL queryni DAO orqali chaqiramiz
+    public BalanceResponse getFullBalance(String userId, LocalDate startDate, LocalDate endDate) {
         BigDecimal totalBalance = transactionDao.getTotalBalance(userId, startDate, endDate);
-
         BalanceResponse response = new BalanceResponse();
         response.setBalance(totalBalance);
         return response;
+    }
+
+    // Foydalanuvchi uchun daromad balansini olib keladi
+    @Override
+    public BalanceResponse getIncomeBalance(String userId, LocalDate StartDate, LocalDate EndDate) {
+        BigDecimal totalBalance = transactionDao.getTotalIncomeBalance(userId, StartDate, EndDate);
+        BalanceResponse response = new BalanceResponse();
+        response.setBalance(totalBalance);
+        return response;
+    }
+
+    // Foydalanuvchi uchun xarajat balansini olib keladi
+    @Override
+    public BalanceResponse getExpenseBalance(String userId, LocalDate startDate, LocalDate endDate) {
+        BigDecimal totalBalance = transactionDao.getTotalExpenseBalance(userId, startDate, endDate);
+        BalanceResponse response = new BalanceResponse();
+        response.setBalance(totalBalance);
+        return response;
+    }
+
+    @Override
+    public DebtBalanceResponce getDebtBalance(String userId, LocalDate localDate, LocalDate localDate1) {
+        return transactionDao.getTotalDebtBalance(userId, localDate, localDate1);
     }
 
 

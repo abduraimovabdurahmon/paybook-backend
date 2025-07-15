@@ -5,8 +5,7 @@ import lombok.Getter;
 @Getter
 public enum DebtType {
     BORROW("BORROW"),
-    LEND("LEND"),
-    TEST("TEST");
+    LEND("LEND");
 
     private final String displayName;
 
