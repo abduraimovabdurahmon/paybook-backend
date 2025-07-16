@@ -1,9 +1,10 @@
 package com.paybook.infrastructure.dao;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paybook.application.dto.response.DebtBalanceResponse;
+import com.paybook.application.dto.response.GroupedIncomeTransactionResponse;
 import com.paybook.application.dto.response.IncomeTransaction;
-import com.paybook.application.dto.response.IncomeTransactionsResponse;
-import com.paybook.domain.entity.Income;
 import com.paybook.infrastructure.repository.DebtRepository;
 import com.paybook.infrastructure.repository.ExpenseRepository;
 import com.paybook.infrastructure.repository.IncomeRepository;
@@ -41,6 +42,11 @@ public class TransactionDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private final ObjectMapper objectMapper;
+
+    public TransactionDao(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
 
     public BigDecimal getTotalBalance(String userId, LocalDate startDate, LocalDate endDate) {
@@ -145,52 +151,99 @@ public class TransactionDao {
         return response;
     }
 
-    public List<IncomeTransaction> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate) {
+    public List<GroupedIncomeTransactionResponse> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate) {
         String sql = """
                 SELECT
-                    i.id,
-                    c.icon,
-                    c.bg_color,
-                    c.title,
-                    i.description,
-                    i.amount,
-                    TO_CHAR(i.created_at, 'YYYY-MM-DD HH24:MI') AS created_at
+                    CONCAT(
+                        TO_CHAR(i.created_at, 'DD'),
+                        ' - ',
+                        CASE EXTRACT(MONTH FROM i.created_at)
+                            WHEN 1 THEN 'Yanvar'
+                            WHEN 2 THEN 'Fevral'
+                            WHEN 3 THEN 'Mart'
+                            WHEN 4 THEN 'Aprel'
+                            WHEN 5 THEN 'May'
+                            WHEN 6 THEN 'Iyun'
+                            WHEN 7 THEN 'Iyul'
+                            WHEN 8 THEN 'Avgust'
+                            WHEN 9 THEN 'Sentabr'
+                            WHEN 10 THEN 'Oktabr'
+                            WHEN 11 THEN 'Noyabr'
+                            WHEN 12 THEN 'Dekabr'
+                        END
+                    ) AS date_key,
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', i.id,
+                            'icon', c.icon,
+                            'bgColor', c.bg_color,
+                            'title', c.title,
+                            'description', i.description,
+                            'amount', i.amount,
+                            'createdAt', TO_CHAR(i.created_at, 'YYYY-MM-DD HH24:MI'),
+                            'time', TO_CHAR(i.created_at, 'HH24:MI')
+                        )
+                        ORDER BY i.created_at DESC
+                    ) AS transactions
                 FROM income i
                 LEFT JOIN category c ON i.category_id = c.id
                 WHERE i.user_id = :userId
                   AND i.created_at BETWEEN :startDate AND :endDate
-                ORDER BY i.created_at DESC;
-        """;
+                GROUP BY 
+                    CONCAT(
+                        TO_CHAR(i.created_at, 'DD'),
+                        ' - ',
+                        CASE EXTRACT(MONTH FROM i.created_at)
+                            WHEN 1 THEN 'Yanvar'
+                            WHEN 2 THEN 'Fevral'
+                            WHEN 3 THEN 'Mart'
+                            WHEN 4 THEN 'Aprel'
+                            WHEN 5 THEN 'May'
+                            WHEN 6 THEN 'Iyun'
+                            WHEN 7 THEN 'Iyul'
+                            WHEN 8 THEN 'Avgust'
+                            WHEN 9 THEN 'Sentabr'
+                            WHEN 10 THEN 'Oktabr'
+                            WHEN 11 THEN 'Noyabr'
+                            WHEN 12 THEN 'Dekabr'
+                        END
+                    )
+                ORDER BY MAX(i.created_at) DESC;
+                """;
 
         Query query = entityManager.createNativeQuery(sql);
 
         Map<String, Object> params = Map.of(
                 "userId", UUID.fromString(userId),
                 "startDate", Timestamp.valueOf(startDate.atStartOfDay()),
-                "endDate", Timestamp.valueOf(endDate.atStartOfDay())
+                "endDate", Timestamp.valueOf(endDate.atTime(23, 59, 59))
         );
 
         params.forEach(query::setParameter);
 
-        var transactions = query.getResultList();
-        if (transactions == null || transactions.isEmpty()) {
+        List<Object> result = query.getResultList();
+        if (result == null || result.isEmpty()) {
             return List.of();
         }
 
-        List<IncomeTransaction> transactionsResponses = new ArrayList<>();
-        for (Object obj : transactions) {
+        List<GroupedIncomeTransactionResponse> responses = new ArrayList<>();
+        for (Object obj : result) {
             Object[] row = (Object[]) obj;
-            IncomeTransaction response = new IncomeTransaction();
-            response.setId(UUID.fromString(row[0].toString()));
-            response.setIcon(row[1].toString());
-            response.setBgColor(row[2].toString());
-            response.setTitle(row[3].toString());
-            response.setDescription(row[4].toString());
-            response.setAmount(new BigDecimal(row[5].toString()));
-            response.setCreatedAt(row[6].toString());
-            transactionsResponses.add(response);
+            GroupedIncomeTransactionResponse response = new GroupedIncomeTransactionResponse();
+            response.setDateKey((String) row[0]);
+
+            try {
+                List<IncomeTransaction> transactions = objectMapper.readValue(
+                        (String) row[1],
+                        new TypeReference<List<IncomeTransaction>>() {}
+                );
+                response.setTransactions(transactions);
+                responses.add(response);
+            } catch (Exception e) {
+                throw new RuntimeException("JSON parsing error", e);
+            }
         }
 
-        return transactionsResponses;
+        return responses;
     }
 }

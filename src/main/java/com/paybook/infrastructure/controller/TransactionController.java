@@ -14,6 +14,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +30,6 @@ public class TransactionController {
         this.transactionUseCase = transactionUseCase;
     }
 
-    // Helper method to extract common logic
     private record DateRange(LocalDate startDate, LocalDate endDate) {}
 
     private DateRange getUserIdAndDateRange() {
@@ -89,14 +89,11 @@ public class TransactionController {
     }
 
 
-    @GetMapping("income")
-    private IncomeTransactionsResponse getIncomeTransactions() {
+    @GetMapping("/income")
+    public List<GroupedIncomeTransactionResponse> getIncomeTransactions() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         DateRange dateRange = getUserIdAndDateRange();
-        List<IncomeTransaction> incomeTransactions = transactionUseCase.getIncomeTransactions(userId, dateRange.startDate(), dateRange.endDate());
-        IncomeTransactionsResponse incomeTransactionsResponse = new IncomeTransactionsResponse();
-        incomeTransactionsResponse.setTransactions(incomeTransactions);
-        return incomeTransactionsResponse;
+        return transactionUseCase.getIncomeTransactions(userId, dateRange.startDate(), dateRange.endDate());
     }
 
 

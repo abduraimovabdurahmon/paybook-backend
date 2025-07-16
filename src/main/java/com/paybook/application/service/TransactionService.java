@@ -78,12 +78,9 @@ public class TransactionService implements TransactionUseCase {
     }
 
     @Override
-    public List<IncomeTransaction> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate) {
-        List<IncomeTransaction> transactions = transactionDao.getIncomeTransactions(userId, startDate, endDate);
-        if (transactions == null || transactions.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return transactions;
+    public List<GroupedIncomeTransactionResponse> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate) {
+        List<GroupedIncomeTransactionResponse> transactions = transactionDao.getIncomeTransactions(userId, startDate, endDate);
+        return transactions != null ? transactions : Collections.emptyList();
     }
 
 
