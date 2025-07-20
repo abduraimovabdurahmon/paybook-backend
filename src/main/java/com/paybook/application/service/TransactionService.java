@@ -83,5 +83,17 @@ public class TransactionService implements TransactionUseCase {
         return transactions != null ? transactions : Collections.emptyList();
     }
 
+    @Override
+    public List<GroupedExpenseTransactionResponse> getExpenseTransactions(String userId, LocalDate startDate, LocalDate endDate) {
+        List<GroupedExpenseTransactionResponse> transactions = transactionDao.getExpenseTransactions(userId, startDate, endDate);
+        return transactions != null ? transactions : Collections.emptyList();
+    }
+
+    @Override
+    public List<GroupedDebtTransactionResponse> getDebtTransactions(String userId, LocalDate startDate, LocalDate endDate) {
+        List<GroupedDebtTransactionResponse> transactions = transactionDao.getDebtTransactions(userId, startDate, endDate);
+        return transactions != null ? transactions : Collections.emptyList();
+    }
+
 
 }

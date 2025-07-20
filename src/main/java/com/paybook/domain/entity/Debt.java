@@ -30,6 +30,8 @@ public class Debt {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "title", nullable = true)
+    private String title;
 
     // type
     @Enumerated(EnumType.STRING)

@@ -18,4 +18,8 @@ public interface TransactionUseCase {
     DebtBalanceResponse getDebtBalance(String userId, LocalDate startDate, LocalDate endDate);
 
     List<GroupedIncomeTransactionResponse> getIncomeTransactions(String userId, LocalDate startDate, LocalDate endDate);
+
+    List<GroupedExpenseTransactionResponse> getExpenseTransactions(String userId, LocalDate startDate, LocalDate endDate);
+
+    List<GroupedDebtTransactionResponse> getDebtTransactions(String userId, LocalDate startDate, LocalDate endDate);
 }

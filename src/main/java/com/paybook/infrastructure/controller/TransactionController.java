@@ -96,5 +96,20 @@ public class TransactionController {
         return transactionUseCase.getIncomeTransactions(userId, dateRange.startDate(), dateRange.endDate());
     }
 
+    @GetMapping("/expense")
+    public List<GroupedExpenseTransactionResponse> getExpenseTransactions() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        DateRange dateRange = getUserIdAndDateRange();
+        List<GroupedExpenseTransactionResponse> transactions = transactionUseCase.getExpenseTransactions(userId, dateRange.startDate(), dateRange.endDate());
+        return transactions != null ? transactions : Collections.emptyList();
+    }
+
+    @GetMapping("/debt")
+    public List<GroupedDebtTransactionResponse> getDebtTransactions() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        DateRange dateRange = getUserIdAndDateRange();
+        return transactionUseCase.getDebtTransactions(userId, dateRange.startDate(), dateRange.endDate());
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package com.paybook.application.dto.response;
+package com.paybook.application.dto.transaction;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,9 +6,9 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Setter
 @Getter
-public class IncomeTransaction {
+@Setter
+public class ExpenseTransaction {
     private UUID id;
     private String icon;
     private String bgColor;
@@ -17,5 +17,4 @@ public class IncomeTransaction {
     private BigDecimal amount;
     private String createdAt;
     private String time;
-
 }

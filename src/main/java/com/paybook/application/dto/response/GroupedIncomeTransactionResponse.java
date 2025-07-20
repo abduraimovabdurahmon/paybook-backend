@@ -1,11 +1,10 @@
 package com.paybook.application.dto.response;
 
+import com.paybook.application.dto.transaction.IncomeTransaction;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @Setter
 @Getter
