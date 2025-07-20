@@ -1,0 +1,4 @@
+### Get all categories
+GET http://localhost:8080/api/categories/list
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

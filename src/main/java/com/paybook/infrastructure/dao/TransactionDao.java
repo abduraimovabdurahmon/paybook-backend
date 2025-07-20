@@ -373,9 +373,9 @@ public class TransactionDao {
                        JSON_BUILD_OBJECT(
                                'id', d.id,
                                'icon', c.icon,
-                               'type', d.type,
                                'bgColor', c.bg_color,
                                'title', d.title,
+                               'type', c.keyword,
                                'description', d.description,
                                'amount', d.amount,
                                'createdAt', TO_CHAR(d.created_at, 'YYYY-MM-DD HH24:MI'),
